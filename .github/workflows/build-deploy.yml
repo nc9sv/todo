@@ -1,0 +1,38 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Update local repository
+        run: |
+          cd ~/Desktop/DevOps
+          git pull --ff-only origin main
+
+      - name: Build backend image
+        run: |
+          cd ~/Desktop/DevOps
+          docker build -t taskboard-backend ./TaskBoard/backend
+
+      - name: Build frontend image
+        run: |
+          cd ~/Desktop/DevOps
+          docker build -t taskboard-frontend ./TaskBoard/frontend
+
+      - name: Deploy application stack
+        run: |
+          cd ~/Desktop/DevOps
+          docker compose up -d --build --remove-orphans
+
+      - name: Verify deployment
+        run: |
+          cd ~/Desktop/DevOps
+          docker compose ps
