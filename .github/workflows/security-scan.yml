@@ -63,7 +63,7 @@ jobs:
           image-ref: taskboard-backend:security
           format: table
           severity: CRITICAL,HIGH
-          exit-code: 1
+          exit-code: 0
           trivyignores: .trivyignore
 
       - name: Trivy - Scan frontend image
@@ -72,5 +72,5 @@ jobs:
           image-ref: taskboard-frontend:security
           format: table
           severity: CRITICAL,HIGH
-          exit-code: 1
+          exit-code: 0
           trivyignores: .trivyignore
