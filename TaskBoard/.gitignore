@@ -1,0 +1,56 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# === Virtualenv ===
+.venv/
+venv/
+env/
+
+# === Alembic ===
+alembic/__pycache__/
+# alembic/versions/*.pyc
+
+# === FastAPI logs ===
+logs/
+*.log
+
+# === Node.js / Frontend ===
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# === Environment files ===
+.env
+.env.*
+!.env.example
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === PyCharm / JetBrains IDE ===
+.idea/
+*.iml
+
+# === Misc ===
+*.swp
+*.swo
+docker-compose.yml
+
+vault/
+script-vault/
