@@ -1,0 +1,74 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  security-scan:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog - Scan repository and history
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --results=verified,unknown
+
+      - name: Bandit - Scan Python backend
+        run: |
+          python3 -m venv /tmp/security-venv
+          /tmp/security-venv/bin/pip install --upgrade pip
+          /tmp/security-venv/bin/pip install bandit
+          /tmp/security-venv/bin/bandit -r TaskBoard/backend -ll
+
+      - name: Hadolint - Scan Dockerfiles
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            hadolint/hadolint:latest \
+            hadolint /workspace/TaskBoard/backend/Dockerfile
+
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            hadolint/hadolint:latest \
+            hadolint /workspace/TaskBoard/frontend/Dockerfile
+
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            hadolint/hadolint:latest \
+            hadolint /workspace/TaskBoard/db/Dockerfile
+
+      - name: Build backend image for Trivy
+        run: |
+          docker build -t taskboard-backend:security ./TaskBoard/backend
+
+      - name: Build frontend image for Trivy
+        run: |
+          docker build -t taskboard-frontend:security ./TaskBoard/frontend
+
+      - name: Trivy - Scan backend image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: taskboard-backend:security
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: 1
+
+      - name: Trivy - Scan frontend image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: taskboard-frontend:security
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: 1
