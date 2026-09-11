@@ -1,0 +1,25 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build backend Docker image
+        run: docker build -t taskboard-backend ./TaskBoard/backend
+
+      - name: Build frontend Docker image
+        run: docker build -t taskboard-frontend ./TaskBoard/frontend
